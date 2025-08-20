@@ -1,0 +1,14 @@
+# Data fetching and manipulation
+yfinance
+pandas
+requests
+python-dotenv
+
+# Machine learning and deep learning
+numpy
+scikit-learn
+tensorflow
+keras
+transformers
+torch
+streamlit
