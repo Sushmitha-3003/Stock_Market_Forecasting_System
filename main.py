@@ -1,12 +1,7 @@
-# main.py
-# This script orchestrates the entire workflow by running all necessary Python files
-# in the correct order based on the project's file structure.
-
 import subprocess
 import sys
 import os
 
-# Define the base directory for the source code, which is the 'src' folder
 SRC_DIR = os.path.join(os.path.dirname(__file__), "src")
 
 def run_script(script_name, subdirectory):
@@ -18,10 +13,8 @@ def run_script(script_name, subdirectory):
     """
     print(f"--- Running {script_name} from {subdirectory} ---")
     try:
-        # Construct the absolute path to the script
         script_path = os.path.join(SRC_DIR, subdirectory, script_name)
         
-        # Use sys.executable to ensure the correct Python interpreter is used
         result = subprocess.run([sys.executable, script_path], check=True)
         print(f"--- {script_name} completed successfully. ---\n")
     except FileNotFoundError:

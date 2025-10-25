@@ -1,4 +1,3 @@
-# app.py — Stock Dashboard (minimal, updated as per requirements)
 import os
 import warnings
 from datetime import timedelta
@@ -15,9 +14,9 @@ except Exception:
 
 warnings.filterwarnings("ignore")
 
-# -----------------------------
+
 # Config
-# -----------------------------
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 PROCESSED_CSV = os.path.join(DATA_DIR, "processed", "combined_features.csv")
@@ -33,9 +32,8 @@ FEATURE_COLS = [
     "sentiment_score",
 ]
 
-# -----------------------------
+
 # Cached Loaders
-# -----------------------------
 @st.cache_data
 def load_features():
     df = pd.read_csv(PROCESSED_CSV)
@@ -54,9 +52,7 @@ def load_model_and_scaler(ticker: str):
     scaler = joblib.load(scaler_path)
     return model, scaler
 
-# -----------------------------
 # Helpers
-# -----------------------------
 def get_last_sequence(df_all, ticker):
     sub = df_all[df_all["ticker"] == ticker].sort_values("date")
     if len(sub) < SEQUENCE_LENGTH:
@@ -95,11 +91,9 @@ def historical_one_step_predictions(df_ticker, model, scaler):
     dates = df_ticker["date"].iloc[SEQUENCE_LENGTH:]
     return pd.Series(preds, index=dates, name="model_pred")
 
-# -----------------------------
 # Pages
-# -----------------------------
 def page_prediction(df_all):
-    st.title("📊 Stock Prediction")
+    st.title(" Stock Prediction")
 
     ticker = st.session_state.get("selected_ticker", DEFAULT_TICKERS[0])
     st.subheader(f"Analysis for {ticker}")
@@ -173,7 +167,7 @@ def page_prediction(df_all):
 
             # Graph with month-level ticks
             # Graph with interactive zoom/pan
-# Clean interactive prediction graph
+            # Clean interactive prediction graph
             fig = go.Figure()
 
             fig.add_trace(go.Scatter(
@@ -207,7 +201,7 @@ def page_prediction(df_all):
 
 
 def page_news(df_all):
-    st.header("📰 Latest News & Sentiment")
+    st.header("Latest News & Sentiment")
     ticker = st.session_state.get("selected_ticker", DEFAULT_TICKERS[0])
 
     per_ticker_path = os.path.join(DATA_DIR, "raw", f"{ticker}_news.csv")
@@ -230,7 +224,6 @@ def page_news(df_all):
     else:
         df_news["text"] = df_news["title"].fillna("")
 
-    # 🔧 Fix: Auto sentiment if label not present
     if "label" not in df_news.columns:
         def auto_label(txt):
             txt = str(txt).lower()
@@ -247,7 +240,7 @@ def page_news(df_all):
         st.markdown(f"<div style='padding:10px;border-radius:6px;margin-bottom:10px;background-color:{color};color:white;font-size:18px;font-weight:600;'>{row['text']} ({row['label']})</div>", unsafe_allow_html=True)
 
 def page_visualization(df_all):
-    st.title("📈 Advanced Visualizations")
+    st.title("Advanced Visualizations")
     ticker = st.session_state.get("selected_ticker", DEFAULT_TICKERS[0])
     df_ticker = df_all[df_all["ticker"] == ticker].sort_values("date")
 
@@ -280,7 +273,7 @@ def page_visualization(df_all):
     st.plotly_chart(fig_vol, use_container_width=True)
 
 def page_report(df_all):
-    st.title("📑 Report")
+    st.title("Report")
 
     ticker = st.session_state.get("selected_ticker", DEFAULT_TICKERS[0])
     st.subheader(f"Last 30 Days Report for {ticker}")
@@ -306,15 +299,14 @@ def page_report(df_all):
     # Download option
     csv = last_30[["date", "Close", "Predicted"]].to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="📥 Download CSV",
+        label="Download CSV",
         data=csv,
         file_name=f"{ticker}_last30_report.csv",
         mime="text/csv"
     )
 
-# -----------------------------
+
 # App Layout
-# -----------------------------
 st.sidebar.title("Navigation")
 try:
     df_all = load_features()

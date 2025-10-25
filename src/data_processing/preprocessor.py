@@ -1,13 +1,9 @@
-# preprocessor.py
-# This script performs final data cleaning, merges live FinBERT news sentiment data,
-# and creates the target variable for the model.
-
 import pandas as pd
 import os
 import sys
 from transformers import pipeline
 
-# Get the path to the root 'src' directory
+
 script_dir = os.path.dirname(os.path.abspath(__file__))
 src_dir = os.path.join(script_dir, '..')
 if src_dir not in sys.path:
@@ -19,14 +15,14 @@ except ImportError as e:
     print(f"Error importing config: {e}")
     sys.exit(1)
 
-# Load FinBERT model once
-print("⏳ Loading FinBERT sentiment model...")
+# Load FinBERT model 
+print("Loading FinBERT sentiment model...")
 sentiment_pipeline = pipeline(
     "sentiment-analysis",
     model="ProsusAI/finbert",
     framework="pt"
 )
-print("✅ FinBERT model loaded.")
+print("FinBERT model loaded.")
 
 def compute_sentiment_from_news(ticker):
     """
@@ -35,10 +31,10 @@ def compute_sentiment_from_news(ticker):
     """
     news_path = os.path.join(config.OUTPUT_DIR, f"{ticker}_news.csv")
     if not os.path.exists(news_path):
-        print(f"⚠️ News file not found for {ticker}: {news_path}")
+        print(f"News file not found for {ticker}: {news_path}")
         return pd.DataFrame(columns=['date', 'sentiment_score'])
 
-    print(f"📄 Loading news for {ticker} from {news_path}")
+    print(f"Loading news for {ticker} from {news_path}")
     news_df = pd.read_csv(news_path)
 
     # Combine headline + summary
@@ -72,18 +68,18 @@ def compute_sentiment_from_news(ticker):
     return daily_sentiment
 
 def preprocess_data():
-    print("🚀 Starting data preprocessing process...")
+    print("Starting data preprocessing process...")
 
     if not os.path.exists(config.PROCESSED_DATA_DIR):
         os.makedirs(config.PROCESSED_DATA_DIR)
-        print(f"📂 Created directory: {config.PROCESSED_DATA_DIR}")
+        print(f"Created directory: {config.PROCESSED_DATA_DIR}")
 
     combined_df = pd.DataFrame()
 
     for ticker in config.TICKERS:
         try:
             enhanced_path = os.path.join(config.ENHANCED_DATA_DIR, f"{ticker}_enhanced_data.csv")
-            print(f"⏳ Loading enhanced data for {ticker} from {enhanced_path}")
+            print(f"Loading enhanced data for {ticker} from {enhanced_path}")
             df = pd.read_csv(enhanced_path)
 
             df['Date'] = pd.to_datetime(df['Date'])
@@ -107,19 +103,19 @@ def preprocess_data():
             merged_df['ticker'] = ticker
 
             combined_df = pd.concat([combined_df, merged_df])
-            print(f"✅ Finished processing {ticker}")
+            print(f"Finished processing {ticker}")
 
         except FileNotFoundError:
-            print(f"❌ Enhanced data file not found for {ticker}")
+            print(f"Enhanced data file not found for {ticker}")
         except Exception as e:
-            print(f"❌ Error processing {ticker}: {e}")
+            print(f"Error processing {ticker}: {e}")
 
     if not combined_df.empty:
         output_path = os.path.join(config.PROCESSED_DATA_DIR, "combined_features.csv")
         combined_df.to_csv(output_path, index=True)
-        print(f"✨ Saved preprocessed data with sentiment to {output_path}")
+        print(f"Saved preprocessed data with sentiment to {output_path}")
     else:
-        print("❌ No data processed.")
+        print("No data processed.")
 
 if __name__ == "__main__":
     preprocess_data()
